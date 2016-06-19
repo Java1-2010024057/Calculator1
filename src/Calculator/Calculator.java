@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.TextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -12,21 +15,22 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class Calculator extends JFrame
+
+public class Calculator extends JFrame implements ActionListener
 {
 	private Container con;
 	private FlowLayout fl = new FlowLayout();
 	private JButton back,clear;
 	private JButton[] n, f;
 	private Box totalbox;
-	private JTextField resultField;
-	private String operand,operator;
- 
+	private JTextField resultField,resultField2;
+	private String op, oper;
+	
 	public Calculator()
 	{
 		super("Calculator");
 		this.init();
-		this.setSize(480,250);
+		this.setSize(480,270);
 		this.setResizable(false);
 		this.setVisible(true);
 	}
@@ -37,18 +41,24 @@ public class Calculator extends JFrame
 		con.setBackground(Color.BLACK);
 		// 결과창
 		JPanel resultPanel = new JPanel();
-		resultPanel.setBackground(Color.black);
 		resultField = new JTextField(40);
 		resultField.setBackground(Color.black);
 		resultField.setHorizontalAlignment(JTextField.RIGHT);
 		resultField.setEnabled(false);
 		resultField.setForeground(Color.red);
-		resultPanel.add(resultField);
-   
+		
+		resultField2 = new JTextField(40);
+		resultField2.setBackground(Color.black);
+		resultField2.setHorizontalAlignment(JTextField.RIGHT);
+		resultField2.setEnabled(false);
+		resultField2.setForeground(Color.red);
+		
 		JPanel resultPanelLine = new JPanel(new BorderLayout());
-		resultPanelLine.add(resultPanel,BorderLayout.CENTER);
-  
+		resultPanelLine.setBackground(Color.black);
+		resultPanelLine.add(resultField,BorderLayout.SOUTH);
+		resultPanelLine.add(resultField2,BorderLayout.NORTH);
 		//백스페이스
+		
 		back=new JButton("Backspace");
 		clear=new JButton("C");
 		JPanel erasePanel = new JPanel();
@@ -86,12 +96,15 @@ public class Calculator extends JFrame
 		f[4]=new JButton("-");
 		f[5]=new JButton("sqrt");
 		f[6]=new JButton("*");
-		f[7]=new JButton("%");
+		f[7]=new JButton("x^2");
 		f[8]=new JButton("/");
 		f[9]=new JButton("1/X");
-  
+		back.addActionListener(this);
+		clear.addActionListener(this);
 		for (int i=0; i<10; i++)
 		{
+			n[i].addActionListener(this);
+			f[i].addActionListener(this);
 			n[i].setForeground(Color.LIGHT_GRAY);
 			f[i].setForeground(Color.LIGHT_GRAY);
 			n[i].setBackground(Color.black);
@@ -153,8 +166,97 @@ public class Calculator extends JFrame
 		con.add(totalbox);
 
 	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		String str = e.getActionCommand();
+		String ans = resultField.getText();
+		String ans2 = resultField2.getText();
+		double result;
+		
+		if(str =="0" || str =="1" || str == "2"|| str== "3" ||
+				str == "4"|| str == "5" || str == "6" || str == "7"|| str == "8" || str == "9" || str =="."){
+		 resultField.setText(ans + str);
+		 resultField2.setText(ans2 + str);
+		}
+		if(str == "+" || str == "-" || str == "*" || str == "/")
+		{
+			oper = ans;
+			op = str;
+			resultField.setText("");
+			resultField2.setText(ans2 + str);
+		}
+		if(str == "x^2"){
+			resultField.setText(""+Double.parseDouble(ans)*Double.parseDouble(ans));
+			resultField2.setText(ans2 + "^2");
+		}
+		if(str == "sqrt")
+		{
+			resultField.setText(""+Math.sqrt(Double.parseDouble(ans)));
+			resultField2.setText(ans2 + "^1/2");
+		}
+		if(str == "1/X")
+		{
+			resultField.setText(""+1/(Double.parseDouble(ans)));
+			resultField2.setText("1/(" + ans2 + ")");
+		}
+		if(str=="+/-")
+		{
+			resultField.setText(""+-1*(Double.parseDouble(ans)));
+			resultField.setText("-1*("+ans2+")");
+		}
 
- 
+		if(str=="=")
+		{
+			char c=op.charAt(0);
+			switch(c)
+			{
+			case '+':
+				result=Double.parseDouble(oper) + Double.parseDouble(ans);
+				resultField.setText(""+result);
+				
+				break;
+			case '-':
+				result=Double.parseDouble(oper) - Double.parseDouble(ans);
+				resultField.setText(""+result);
+			
+				break;
+			case '*':
+				result=Double.parseDouble(oper) * Double.parseDouble(ans);
+				resultField.setText(""+result);
+			
+				break;
+			case '/':
+				result=Double.parseDouble(oper) / Double.parseDouble(ans);
+				resultField.setText(""+result);
+
+				break;
+			}
+		}
+		
+		if(str == "C")
+		{
+			resultField.setText("");
+			resultField2.setText("");
+		}
+		
+		if(str == "Backspace")
+		{
+			String temp=resultField.getText();
+			temp=temp.substring(0,temp.length()-1);
+			resultField.setText(temp);
+			String temp2=resultField2.getText();
+			temp2 = temp2.substring(0,temp2.length()-1);
+			resultField2.setText(temp2);
+			
+		}
+
+	}
+
+	
+		
+	
 	public static void main(String args[])
 	{
 		new Calculator();
